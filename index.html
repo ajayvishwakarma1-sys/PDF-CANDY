@@ -3,11 +3,137 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
+    <title>PDF Candy Clone - Vanilla JS</title>
+    <!-- Tailwind configured via Vite will compile this correctly -->
+    <link rel="stylesheet" href="/src/index.css" />
+    <script src="https://unpkg.com/lucide@latest"></script>
   </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="bg-gray-50 font-sans text-gray-900 min-h-screen flex flex-col transition-all">
+    
+    <!-- Navbar -->
+    <nav class="sticky top-0 z-50 w-full border-b border-gray-200 bg-white/80 backdrop-blur-md">
+      <div class="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div id="nav-brand" class="flex items-center gap-2 cursor-pointer transition-opacity hover:opacity-80">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500 text-white shadow-lg shadow-orange-200">
+            <i data-lucide="candy" class="h-6 w-6"></i>
+          </div>
+          <span class="text-xl font-bold tracking-tight text-gray-900">PDF Candy</span>
+        </div>
+        <div class="hidden md:block">
+          <div class="flex items-center gap-8">
+            <button id="nav-all-tools" class="text-sm font-medium text-gray-600 hover:text-orange-500">All Tools</button>
+            <button class="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition-all hover:bg-gray-800 active:scale-95">Sign In</button>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-1">
+      
+      <!-- Home View -->
+      <div id="home-view" class="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8 transition-opacity duration-300">
+        <div class="mb-16 text-center">
+          <h1 class="mb-6 text-5xl font-black tracking-tight sm:text-7xl">
+            PDF tools for <span class="text-orange-500">everyone.</span>
+          </h1>
+          <p class="mx-auto max-w-2xl text-xl text-gray-500">
+             Pure Vanilla JS, HTML, and CSS edition. The easiest way to edit, convert, and manage your PDF files online. Free, fast, and secure.
+          </p>
+        </div>
+
+        <!-- Search and Category Filter -->
+        <div class="mb-12 flex flex-col items-center gap-8">
+          <div class="relative w-full max-w-xl">
+            <i data-lucide="search" class="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400"></i>
+            <input id="search-input" type="text" placeholder="Search for a tool (e.g. 'merge', 'word')..." class="w-full rounded-2xl border border-gray-200 bg-white py-4 pl-12 pr-4 text-lg transition-all shadow-sm focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10" />
+          </div>
+          <div id="category-filters" class="flex flex-wrap justify-center gap-3">
+            <!-- Categories injected here -->
+          </div>
+        </div>
+
+        <!-- Tool Grid -->
+        <div id="tools-grid" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+           <!-- Tools injected here -->
+        </div>
+      </div>
+
+      <!-- Tool View -->
+      <div id="tool-view" class="hidden mx-auto max-w-4xl px-4 py-12 transition-opacity duration-300">
+        <button id="back-btn" class="mb-8 flex items-center gap-2 text-sm font-semibold text-gray-500 hover:text-orange-500 transition-colors">
+          <i data-lucide="arrow-left" class="h-4 w-4"></i> Back to all tools
+        </button>
+
+        <div class="mb-12 text-center">
+          <h1 id="active-tool-name" class="mb-4 text-4xl font-black tracking-tight text-gray-900">Tool Name</h1>
+          <p id="active-tool-desc" class="text-lg text-gray-500">Tool Description</p>
+        </div>
+
+        <div id="upload-section" class="space-y-8">
+          <!-- Dropzone -->
+          <input type="file" id="file-input" class="hidden" accept="application/pdf, text/plain" />
+          <div id="dropzone" class="relative flex min-h-[400px] w-full cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed border-gray-300 bg-white shadow-sm transition-all hover:border-orange-300 hover:bg-gray-50">
+            <div class="flex flex-col items-center text-center px-6">
+              <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-white shadow-xl shadow-gray-200">
+                <i data-lucide="upload" class="h-10 w-10 text-orange-500"></i>
+              </div>
+              <h2 class="mb-2 text-2xl font-bold text-gray-900">Upload files here</h2>
+              <p class="mb-8 text-gray-500">Drag and drop your files here, or click to select</p>
+              <button class="flex items-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-orange-200 transition-all hover:bg-orange-600 hover:shadow-orange-300 active:scale-95">
+                <i data-lucide="plus" class="h-6 w-6"></i> Add Files
+              </button>
+            </div>
+          </div>
+
+          <!-- Selected File UI -->
+          <div id="selected-file-ui" class="hidden rounded-2xl border border-gray-100 bg-white p-6 shadow-sm">
+            <h3 class="mb-4 font-bold text-gray-900">Selected File</h3>
+            <div class="flex items-center justify-between rounded-lg bg-gray-50 p-3">
+              <div class="flex items-center gap-3">
+                <i data-lucide="file-text" class="h-5 w-5 text-orange-500"></i>
+                <span id="selected-file-name" class="text-sm font-medium text-gray-700 truncate max-w-[200px] md:max-w-[400px]">file.pdf</span>
+              </div>
+              <button id="remove-file-btn" class="text-gray-400 hover:text-red-500 transition-colors">
+                <i data-lucide="x" class="h-4 w-4"></i>
+              </button>
+            </div>
+            <button id="process-btn" class="mt-6 w-full rounded-xl bg-gray-900 py-4 text-lg font-bold text-white transition-all hover:bg-gray-800 active:scale-95 disabled:opacity-50">
+              Process PDF
+            </button>
+          </div>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="hidden flex flex-col items-center rounded-3xl border border-orange-100 bg-white p-12 text-center shadow-sm">
+          <div class="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-green-50 shadow-xl shadow-green-100">
+            <i data-lucide="check-circle-2" class="h-10 w-10 text-green-500"></i>
+          </div>
+          <h2 class="mb-2 text-2xl font-bold text-gray-900">Task Completed!</h2>
+          <p class="mb-8 text-gray-600">Your processed file is ready for download.</p>
+          <div class="flex gap-4">
+            <a id="download-link" href="#" download="processed.pdf" class="flex items-center gap-2 rounded-full bg-orange-500 px-8 py-4 text-lg font-bold text-white shadow-lg shadow-orange-200 transition-all hover:bg-orange-600 active:scale-95">
+              <i data-lucide="download" class="h-6 w-6"></i> Download File
+            </a>
+            <button id="start-over-btn" class="rounded-full bg-white px-8 py-4 text-lg font-bold text-gray-900 shadow-sm border border-gray-200 transition-colors hover:bg-gray-50 active:scale-95">
+              Start Over
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+    
+    <footer class="mt-20 border-t border-gray-200 bg-white py-12">
+       <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-8">
+          <div class="flex items-center gap-2">
+            <i data-lucide="candy" class="text-orange-500 h-6 w-6"></i>
+            <span class="text-lg font-bold">PDF Candy</span>
+          </div>
+          <p class="text-sm text-gray-400">© 2026 PDF Candy Clone. Built with Vanilla JS, HTML & Tailwind CSS.</p>
+       </div>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>
 
